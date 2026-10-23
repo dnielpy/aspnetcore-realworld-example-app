@@ -23,7 +23,7 @@ This uses ASP.NET Core with:
 - [Bullseye](https://github.com/adamralph/bullseye) for building
 - JWT authentication using [ASP.NET Core JWT Bearer Authentication](https://learn.microsoft.com/aspnet/core/security/authentication/jwt)
 - [CSharpier](https://csharpier.com/) for formatting
-- `.editorconfig` to enforce usage patterns
+- `.editorconfig` to enforce usage patterns.
 
 The basic architecture is based on this reference architecture: [ContosoUniversityCore](https://github.com/jbogard/ContosoUniversityCore).
 
