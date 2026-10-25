@@ -85,6 +85,52 @@ public class ListTests : SliceFixture
     }
 
     [Fact]
+    public async Task Expect_List_Articles_Limit_Is_Capped_At_Max()
+    {
+        const int articleCount = List.MaxLimit + 5;
+        await CreateArticles(articleCount);
+
+        var result = await SendAsync(new List.Query(null, null, null, List.MaxLimit + 400, 0));
+
+        Assert.Equal(List.MaxLimit, result.Articles.Count);
+        Assert.Equal(articleCount, result.ArticlesCount);
+    }
+
+    [Fact]
+    public async Task Expect_List_Articles_Without_Limit_Uses_Default()
+    {
+        const int articleCount = List.DefaultLimit + 5;
+        await CreateArticles(articleCount);
+
+        var result = await SendAsync(new List.Query(null, null, null, null, null));
+
+        Assert.Equal(List.DefaultLimit, result.Articles.Count);
+        Assert.Equal(articleCount, result.ArticlesCount);
+    }
+
+    private async Task CreateArticles(int count)
+    {
+        var user = await Users.UserHelpers.CreateDefaultUser(this);
+        var dbContext = GetDbContext();
+        var currentAccessor = new StubCurrentUserAccessor(user.Username);
+        var handler = new Create.Handler(dbContext, currentAccessor);
+        for (var i = 0; i < count; i++)
+        {
+            await handler.Handle(
+                new Create.Command(
+                    new Create.ArticleData
+                    {
+                        Title = $"Test article limit {i}",
+                        Description = "Description",
+                        Body = "Body",
+                    }
+                ),
+                CancellationToken.None
+            );
+        }
+    }
+
+    [Fact]
     public async Task Expect_Feed_With_No_Params_Returns_Empty_For_User_With_No_Follows()
     {
         var user = await Users.UserHelpers.CreateDefaultUser(this);

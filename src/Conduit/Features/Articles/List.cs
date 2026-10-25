@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -12,6 +13,9 @@ namespace Conduit.Features.Articles;
 
 public class List
 {
+    public const int DefaultLimit = 20;
+    public const int MaxLimit = 100;
+
     public record Query(
         string? Tag,
         string? Author,
@@ -68,11 +72,12 @@ public class List
             }
 
             var count = await queryable.CountAsync(cancellationToken);
+            var limit = Math.Min(message.Limit ?? DefaultLimit, MaxLimit);
             var articles = await queryable
                 .OrderByDescending(x => x.CreatedAt)
                 .ThenByDescending(x => x.ArticleId)
                 .Skip(message.Offset ?? 0)
-                .Take(message.Limit ?? 20)
+                .Take(limit)
                 .Select(x => new ArticleSummary
                 {
                     Slug = x.Slug,
