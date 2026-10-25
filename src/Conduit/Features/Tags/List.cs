@@ -20,7 +20,8 @@ public class List
         )
         {
             var tags = await context
-                .Tags.OrderBy(x => x.TagId)
+                .Tags.Where(x => x.ArticleTags.Any())
+                .OrderBy(x => x.TagId)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
             return new TagsEnvelope
